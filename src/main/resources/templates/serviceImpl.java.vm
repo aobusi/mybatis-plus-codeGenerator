@@ -1,0 +1,41 @@
+package ${package.ServiceImpl};
+
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import ${package.Entity}.${entity};
+import ${package.Vm}.${table.entityName}VM;
+import ${package.Mapper}.${table.mapperName};
+import ${package.Service}.${table.serviceName};
+import ${package.DtoMapper}.${table.dtoMapperName};
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+
+/**
+ * <p>
+ * $!{table.comment} 服务实现类
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Service
+#if(${kotlin})
+open class ${table.serviceImplName} : ${superServiceImplClass}<${table.mapperName}, ${entity}>(), ${table.serviceName} {
+
+}
+#else
+    #set ($camelEntity = $table.entityName.substring(0,1).toLowerCase() + $table.entityName.substring(1, $table.entityName.length()))
+    #set ($dtoMapperName = $table.dtoMapperName.substring(0,1).toLowerCase() + $table.dtoMapperName.substring(1,$table.dtoMapperName.length()))
+public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.mapperName}, ${entity}> implements ${table.serviceName} {
+    @Autowired
+    ${table.dtoMapperName} ${dtoMapperName};
+
+    @Override
+    public Page<${table.entityName}>select${table.entityName}Page(Page<${table.entityName}>page, ${table.entityName}VM ${camelEntity}VM){
+        EntityWrapper<${table.entityName}> wrapper = new EntityWrapper<>();
+        wrapper.setEntity(${dtoMapperName}.vmToEntity(${camelEntity}VM));
+        return selectPage(page, wrapper);
+    }
+}
+#end

@@ -1,0 +1,145 @@
+package ${package.Controller};
+
+
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.wooki.core.util.common.mybatis.PaginationUtil;
+import com.wooki.core.function.exception.NotFoundException;
+
+#if(${swagger2})
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+#end
+import ${package.Service}.${table.serviceName};
+import ${package.DtoMapper}.${table.dtoMapperName};
+import ${package.Entity}.${table.entityName};
+import ${package.Dto}.${table.entityName}DTO;
+import ${package.Vm}.${table.entityName}VM;
+#if(${restControllerStyle})
+import org.springframework.web.bind.annotation.RestController;
+#else
+import org.springframework.stereotype.Controller;
+#end
+#if(${superControllerClassPackage})
+import ${superControllerClassPackage};
+#end
+import java.net.URISyntaxException;
+import java.util.List;
+import java.net.URI;
+import java.util.stream.Collectors;
+
+/**
+ * <p>
+ * $!{table.comment} 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Api(description = "$!{table.comment}管理")
+@RestController
+@RequestMapping("#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}s#end")
+#if(${superControllerClass})
+public class ${table.controllerName} extends ${superControllerClass} {
+#else
+public class ${table.controllerName} {
+#end
+
+#set ($serviceName = $table.serviceName.substring(0,1).toLowerCase() + $table.serviceName.substring(1,$table.serviceName.length()))
+#set ($dtoMapperName = $table.dtoMapperName.substring(0,1).toLowerCase() + $table.dtoMapperName.substring(1,$table.dtoMapperName.length()))
+#set ($camelEntity = $table.entityName.substring(0,1).toLowerCase() + $table.entityName.substring(1, $table.entityName.length()))
+    @Autowired
+    ${table.serviceName} ${serviceName};
+
+    @Autowired
+    ${table.dtoMapperName} ${dtoMapperName};
+
+    /**
+     * $!{table.comment}列表
+     * @param page
+     * @return
+     */
+#if(${swagger2})
+    @ApiOperation(value = "List${table.entityName}", notes = "$!{table.comment}列表")
+#end
+    @GetMapping("")
+    public ResponseEntity<Page<${table.entityName}>> List${table.entityName}s(Page<${table.entityName}> page, ${table.entityName}VM ${camelEntity}VM){
+        page = ${serviceName}.select${table.entityName}Page(page, ${camelEntity}VM);
+        return ResponseEntity.ok(page);
+    }
+
+    /**
+     * 创建$!{table.comment}
+     * @return the ResponseEntity with status 201 (OK)
+     */
+#if(${swagger2})
+    @ApiOperation(value = "Create${table.entityPath}", notes = "创建$!{table.comment}")
+#end
+    @PostMapping("")
+    public ResponseEntity<${table.entityName}DTO> create${table.entityName}(@RequestBody ${table.entityName}VM ${camelEntity}VM) throws URISyntaxException {
+        ${table.entityName} ${camelEntity} = ${dtoMapperName}.vmToEntity(${camelEntity}VM);
+        ${serviceName}.insert(${camelEntity});
+        return ResponseEntity.ok()
+        .body(${dtoMapperName}.entityToDto(${camelEntity}));
+    }
+
+    /**
+     * 获取$!{table.comment}
+     * @param id
+     * @return the ResponseEntity with status 200 (OK)
+     */
+#if(${swagger2})
+    @ApiOperation(value = "Get${table.entityName}", notes = "获取$!{table.comment}")
+#end
+    @GetMapping("/{id}")
+    public ResponseEntity<${table.entityName}DTO> get${table.entityName}(@PathVariable Long id){
+        ${table.entityName} ${camelEntity} = ${serviceName}.selectById(id);
+        if (${camelEntity} == null) {
+            throw new NotFoundException(10004, "not-exist");
+        }
+        return ResponseEntity.ok().body(${dtoMapperName}.entityToDto(${camelEntity}));
+    }
+
+    /**
+     * 修改$!{table.comment}
+     * @param id
+     * @return the ResponseEntity with status 200 (OK)
+     */
+#if(${swagger2})
+    @ApiOperation(value = "Update${table.entityName}", notes = "修改$!{table.comment}")
+#end
+    @PutMapping("/{id}")
+    public ResponseEntity<${table.entityName}DTO> update${table.entityName}(@PathVariable Long id, @RequestBody ${table.entityName}VM ${camelEntity}VM){
+        ${table.entityName} ${camelEntity} = ${dtoMapperName}.vmToEntity(${camelEntity}VM);
+        ${camelEntity}.setId(id);
+        boolean result = ${serviceName}.updateById(${camelEntity});
+        if (result) {
+            return ResponseEntity.ok().body(${dtoMapperName}.entityToDto(${camelEntity}));
+        } else {
+            throw new NotFoundException(10004, "not-exist");
+        }
+    }
+
+    /**
+     * 删除$!{table.comment}
+     * @param id
+     * @return the ResponseEntity with status 200 (OK)
+     */
+#if(${swagger2})
+    @ApiOperation(value = "Delete${table.entityName}", notes = "删除$!{table.comment}")
+#end
+    @DeleteMapping("/{id}")
+    public @ResponseBody ResponseEntity<Void> delete${table.entityName}(@PathVariable Long id) {
+        boolean result = ${serviceName}.deleteById(id);
+        if (result) {
+            return ResponseEntity.ok().build();
+        } else {
+            throw new NotFoundException(10004, "not-exist");
+        }
+     }
+
+}

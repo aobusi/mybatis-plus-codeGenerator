@@ -1,0 +1,28 @@
+package ${package.DtoMapper};
+
+import ${package.Entity}.${entity};
+import ${package.Dto}.${entity}DTO;
+import ${package.Vm}.${entity}VM;
+import org.mapstruct.Mapper;
+
+/**
+ * <p>
+ * $!{table.comment} 模型转换
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Mapper(componentModel = "spring")
+public interface ${table.dtoMapperName}  {
+    /**
+     *  entity 转成 dto
+     */
+    ${entity}DTO entityToDto(${entity} obj);
+
+    /**
+     * vm 转成 entity
+     */
+    ${entity} vmToEntity(${entity}VM objVM);
+}
+
